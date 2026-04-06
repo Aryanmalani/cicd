@@ -1,41 +1,27 @@
-{
-name: Push-to-EC2
+# The name of the workflow as it appears in the GitHub Actions tab
+name: GitHub Actions Demo
 
-# Trigger deployment only on push to main branch
-on:
-  push:
-    branches:
-      - main
+# Defines the events that trigger the workflow (e.g., every time you push code)
+on: [push]
 
+# Groups all the tasks that run in the workflow
 jobs:
-  deploy:
-    name: Deploy to EC2 on master branch push
+  build-and-test:
+    # Specifies the type of virtual machine to run the job on
     runs-on: ubuntu-latest
 
+    # A sequence of tasks to be executed
     steps:
-      - name: Checkout the files
-        uses: actions/checkout@v2
+      # 1. Standard action to download your repository code onto the runner
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Deploy to Server 1
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_DNS }}
-          REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: ${{ secrets.TARGET_DIR }}
+      # 2. Run a simple shell command
+      - name: Run a Hello World script
+        run: echo "Hello, GitHub Actions is working!"
 
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_DNS }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            sudo apt-get -y update
-            sudo apt-get install -y apache2
-            sudo systemctl start apache2
-            sudo systemctl enable apache2
-            cd home
-            sudo mv * /var/www/html
-
-}
+      # 3. Example of running multiple commands
+      - name: List files in the repository
+        run: |
+          ls -R
+          echo "Process complete."
